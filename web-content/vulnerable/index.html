@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>webセキュリティ検証ラボ（SecLab）</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .menu-item{ margin-bottom: 15px; }
+        .menu-item a {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            text-decoration: none;
+            color: #007bff;
+            border-radius: 5px;
+        }
+        .menu-item p { margin-top: 5px; color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>🌐 Webセキュリティ検証ラボ (SecLab)</h1>
+    <p>各種web脆弱性の動作原理を検証するための環境です。</p>
+
+    <h2>検証テーマ</h2>
+
+    <div class="menu-item">
+        <a href="cors_test.html">【テーマ 1】オリジン間リソース共有（CORS）検証</a>
+        <p>異なるオリジン間でのXHRリクエストの動作と、サーバー側のヘッダー設定が与える影響を確認します。</p>
+    </div>
+
+    <div class="menu-item">
+        <a href="reflected_xss_form_simple.html">【テーマ 2】反射型 XSS (フォーム送信で発動 document.write版)</a>
+        <p>GETメソッドのフォーム送信で、入力値が無検査に反射され、XSSが発動する仕組みを再現します。</p>
+    </div>
+
+    <div class="menu-item">
+        <a href="reflected_xss_form.html">【テーマ 3】反射型 XSS （フォーム送信で発動 innerHTML版）</a> 
+        <p>GETメソッドのフォーム送信で、入力値が無検査に反射され、XSSが発動する仕組みを再現します。</p>
+    </div>
+
+    <div class="menu-item p-4 mb-4 bg-green-50 rounded-lg shadow-md">
+        <a href="reflected_xss_form_simple_escape.html" class="text-xl font-semibold text-green-700 hover:text-green-900 block">【テーマ 4】反射型 XSS （エスケープ対策版）</a>
+        <p class="text-gray-600 mt-1">テーマ 2 のページに HTML エスケープ処理を実装し、XSS攻撃を防ぐための防御策を検証します。</p>
+    </div>
+
+    <div class="menu-item p-4 mb-4 bg-green-50 rounded-lg shadow-md">
+        <a href="reflected_xss_form_simple_csp.html" class="text-xl font-semibold text-green-700 hover:text-green-900 block">【テーマ 5】反射型 XSS （CSP対策版）</a>
+        <p class="text-gray-600 mt-1">テーマ 2 のページに CSP を実装し、XSS攻撃を防ぐための防御策を検証します。</p>
+        <p class="text-gray-600 mt-1">Nginx設定で レスポンスヘッダーに Content-Security-Policy を追加するのではなく、HTMLのmetaタグで追加しています。 </p>
+    </div>
+
+    <div class="menu-item p-4 mb-4 bg-green-50 rounded-lg shadow-md">
+        <a href="dom_xss.html" class="text-xl font-semibold text-green-700 hover:text-green-900 block">【テーマ 6】DOM型 XSS （innerHTMLによるdiv変更）</a>
+        <p class="text-gray-600 mt-1">サーバーを介さず、JavaScriptによる**innerHTML**の利用など、**DOM**の脆弱性が悪用されXSSが発動する仕組みを再現します。</p>
+    </div>
+
+</body>
+</html>
+

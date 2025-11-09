@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>【テーマ 6】DOM-based XSS 検証</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f8f8f8; }
+        .container { max-width: 700px; margin: 0 auto; background-color: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .result-box { margin-top: 20px; padding: 15px; border: 2px dashed #ff9900; background-color: #fffaf0; }
+        .payload-box { margin-top: 30px; padding: 10px; border: 1px dashed #007bff; background-color: #e6f7ff; }
+        pre { background-color: #fff; padding: 5px; border: 1px solid #ddd; white-space: pre-wrap; }
+        .warning { color: #c00; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: #ff9900;">⚡ 【テーマ 6】DOM-based XSS</h1>
+        <p>このページは、URLのハッシュ（#以降）を無検査で DOM に書き込んでいます。</p>
+        
+        <div class="result-box">
+            <h2>ハッシュからの挿入結果:</h2>
+            <div id="result">
+                <!-- ★★★ ここにユーザー入力（ハッシュ値）が無検査で挿入される ★★★ -->
+                ハッシュ値がありません。URLの末尾に `#<ペイロード>` を追加してください。
+            </div>
+        </div>
+
+        <div class="payload-box">
+            <strong>💡 検証用 DOM-XSS ペイロードの例：</strong>
+            <pre>#&lt;img src=x onerror=alert('DOM-XSS成功！')&gt;</pre>
+            <p class="warning">
+                ※ ペイロードの先頭には「#」を付けてください。<br>
+                例: ページURL/dom_xss.html<span style="color: #ff0000; font-weight: bold;">#&lt;img src=x onerror=alert('DOM-XSS成功！')&gt;</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 1. URLのハッシュ（#以降）を取得する
+        const rawHash = window.location.hash.substring(1); // #を削除
+        const resultElement = document.getElementById('result');
+
+        alert('取得したハッシュ値 (rawHash): \n\n' + rawHash);
+
+        if (rawHash) {
+            let hash;
+
+            try {
+                // rawHash をデコードし、HTMLタグに戻す
+                hash = decodeURI(rewHash);
+
+                alert('デコード成功したハッシュ値 (hash): \n\n' + hash);
+            } catch(e) {
+               　// デコードに失敗した場合は、とりあえず rawHashをセットする
+                hash = rawHash;
+
+                alert('デコード失敗したハッシュ値 (hash): \n\n' + hash);
+            } 
+
+            // ★★★ 脆弱な処理 ★★★
+            // ユーザー入力をチェックせずに、innerHTMLに直接書き込む
+            resultElement.innerHTML = hash;
+            
+            // 挿入された後に、元のテキストを消す
+            resultElement.insertAdjacentHTML('afterbegin', '<strong>挿入された値: </strong>');
+        }
+    </script>
+</body>
+</html>

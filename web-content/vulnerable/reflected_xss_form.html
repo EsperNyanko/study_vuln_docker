@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>【テーマ 2】反射型 XSS 検証フォーム</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .vulnerable { color: red; font-weight: bold; border: 1px dashed red; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔎 反射型 XSS 検証フォーム (未対策)</h1>
+    <p>このフォームは、サーバーから返された検索クエリをそのままページに表示する、**脆弱な**作りになっています。</p>
+
+    <form id="searchForm" action="reflected_xss_form.html" method=GET>
+        <label for="query">検索ワード / XSSペイロード:</label><br>
+        <input type="text" id="query" name="q" size="60" required placeholder="例: <script>alert('XSS')</script>">
+        <button type="submit">送信</button>
+    </form>
+
+    <div style="margin-top: 20px; padding: 10px; border: 1px dashed #007bff; background-color: #e6f7ff;">
+        <strong>💡 検証用 XSS ペイロードの例：</strong>
+        <pre style="background-color: #fff; padding: 5px; border: 1px solid #ddd; overflow-x: auto;">
+            1.  &lt;script&gt;alert('Hello!')&lt;/script&gt;
+            2.  &lt;img src=x onerror=alert('XSS成功！')&gt;</pre>
+        <p style="color: #c00;">
+            ※ **1番目の例** は、ブラウザのXSS防御機能にブロックされ、発動しない可能性があります。<br>
+            ※ **2番目の例** の方が、ブラウザの防御機能を回避しやすく、検証に適しています。
+        </p>
+    </div>
+
+<hr>
+
+<div id="result">
+    <p>フォームに値を入力し、「送信」ボタンを押してください。</p>
+</div>
+
+<script>
+    // ページロード時に、URLのクエリパラメータをチェック
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    const resultDiv = document.getElementById('result');
+
+    if (query) {
+        // デコード処理
+        const decodedQuery = decodeURIComponent(query.replace(/\+/g, ' '));
+
+        // ユーザー入力 (ペイロード) がそのままHTMLとして扱われる！
+        // XSSペイロードが入っていれば、ここでアラートが発動し、
+        // 画面には何も表示されません（アラートが画面をブロックするため）。
+        resultDiv.innerHTML = '<div class="vulnerable">👇 あなたの入力がここに無検査で表示されます 👇</div>';
+
+        resultDiv.innerHTML += '<div>入力値: ' + decodedQuery + '</div>';
+    } else {
+        // 初期状態またはクエリがない場合
+        resultDiv.innerHTML = '<p>フォームに値を入力し、「送信」ボタンを押してください。</p>';
+    }
+</script>
+</body>
+
+</html>

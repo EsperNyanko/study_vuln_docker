@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>【テーマ 4】反射型 XSS (エスケープ対策版)</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .payload-box {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px dashed #007bff;
+            background-color: #e6f7ff;
+        }
+        pre {
+            background-color: #fff; 
+            padding: 5px; 
+            border: 1px solid #ddd; 
+            overflow-x: auto;
+            white-space: pre-wrap; /* 長いペイロードでも折り返しを可能にする */
+        }
+        .warning { color: #c00; }
+    </style>
+</head>
+<body>
+    <h1>🔎 反射型 XSS 検証ページ (XSS対策版)</h1>
+
+    <form action="reflected_xss_form_simple_escape.html" method="GET">
+        <label for="query">ペイロードを入力:</label>
+        <input type="text" name="q" size="60" required>
+        <button type="submit">送信</button>
+    </form>
+    
+    <div class="payload-box">
+        <strong>💡 検証用 XSS ペイロードの例：</strong>
+        <pre>
+            1. &lt;script&gt;alert('Hello!')&lt;/script&gt;
+            2. &lt;img src=x onerror=alert('XSS成功！')&gt;</pre>
+        <p class="warning">
+            ※ 1番目の例でも発動するはずです (document.write()使用)。発動しない場合は、2番目の例を使用してください。<br>
+            ※ ペイロードをコピーし、上のフォームに貼り付けて送信ボタンを押してください。
+        </p>
+    </div>
+    
+    <hr>
+    
+    <h3>反射結果:</h3>
+
+    <script>
+        // ★ XSS防御策 ★: HTML特殊文字をエスケープする関数を追加
+        const escapeHtml = (unsafe) => {
+            if (!unsafe) return '';
+
+            return unsafe.replace(/[&<>"']/g, function(match) {
+                const replacements = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                };
+                return replacements[match];
+            });
+        }; 
+
+        // 1. URLからクエリパラメータ 'q' の値を取得
+        const params = new URLSearchParams(window.location.search);
+        const query = params.get('q');
+        
+        if (query) {
+            const decodedQuery = decodeURIComponent(query.replace(/\+/g, ' '));
+
+            // ★ 修正箇所 1 ★: 脆弱性に関するメッセージを対策版に変更
+            document.write('<h1>✅ XSS対策済みページ</h1>');
+            document.write('<div style="color: green; font-weight: bold;">ユーザー入力はエスケープ処理されています。</div><hr>');
+            
+            // ★ 修正箇所 2 ★: エスケープ処理を適用
+            const safeQuery = escapeHtml(decodedQuery);
+
+            // ユーザー入力をHTMLストリームに書き込むが、無害化されているためスクリプトは実行されない
+            document.write('ユーザー入力 (安全): ' + safeQuery);
+
+            document.write('<div style="margin-top: 20px;">ペイロードがそのままテキストとして表示されることを確認してください。</div>');
+            // NOTE: document.write() の後でページの内容がすべて置き換わるため、
+            // このスクリプト以降のHTMLは通常、表示されなくなります。
+        }
+    </script>
+</body>
+</html>

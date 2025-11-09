@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Vulnerable Site (Port 8080)</title>
+</head>
+<body>
+    <h1>vulnerable-web</h1>
+    <p>このサイトは、別サイト（<a href="http://external-web/">external-web:80</a> に対してXHRリクエストを送信する実験用です。）</p>
+
+    <button onclick="sendRequest()">外部サイトへのXHR送信</button>
+    <div id="result"></div>
+
+    <script>
+        function sendRequest() {
+            const xhr = new XMLHttpRequest();
+            const url = 'http://localhost:8081/'; 
+
+            xhr.open('GET', url, true);
+            // 脆弱性によっては、withCredentials=true が必要になることがあります
+            // xhr.withCredentials = true;
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    document.getElementById('result').innerHTML = '<h3>リクエスト成功！（200 OK）</h3>' + xhr.responseText.substring(0, 300) + '...<pre>';
+                } else {
+                    document.getElementById('result').innerHTML = '<h3>リクエスト失敗！（Status: ' + xhr.status + '）</h3><p>CORSエラーなどが考えられます。</p>';
+                }
+            };
+
+            xhr.onerror = function() {
+                    document.getElementById('result').innerHTML = '<h3>リクエストエラー！</h3><p>CORSエラーなどが考えられます。</p>';
+            };
+
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
+  
+   
+
+    

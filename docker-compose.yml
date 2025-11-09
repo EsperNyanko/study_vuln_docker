@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  vulnerable-web:
+    build:
+      context: ./nginx-builder
+      dockerfile: Dockerfile
+    container_name: vulnerable-web-server
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web-content/vulnerable:/usr/local/nginx/html
+      - ./nginx-builder/nginx_vulnerable-web.conf:/usr/local/nginx/conf/nginx.conf
+    depends_on:
+      - external-web
+    restart: always
+
+  external-web:
+    build:
+      context: ./nginx-builder
+      dockerfile: Dockerfile
+    container_name: external-web-server
+    ports:
+      - "8081:80"
+    volumes:
+      - ./web-content/external:/usr/local/nginx/html
+      - ./nginx-builder/nginx_external-web.conf:/usr/local/nginx/conf/nginx.conf
+    restart: always
+
+  attacker-cli:
+    image: alpine/curl:latest
+    container_name: attacker-cli
+    command: sh
+    tty: true
+    volumes:
+      - ./logs:/var/log/attack_logs
+
+  
